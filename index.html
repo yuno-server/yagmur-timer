@@ -269,7 +269,9 @@
     playsinline
     disablepictureinpicture
     disableremoteplayback
-  ></video>
+  >
+    <source src="video.mp4" type="video/mp4">
+  </video>
   <div class="video-overlay"></div>
 
   <div class="stage-inner">
@@ -322,36 +324,8 @@
 </div>
 
 <script>
-  // ---- Video kaynağı: Netlify'da barındırılan video ----
   const bgVideo = document.getElementById('bgVideo');
-  const VIDEO_SOURCES = [
-    'https://coruscating-dragon-72206a.netlify.app/dolu%20kadehi%20ters%20tut%20-%20dilerim%20ki%20(live%20_assos)(1080p_hd).mp4'
-  ];
-  let videoSourceIndex = 0;
-
-  function loadNextVideoSource(){
-    if (videoSourceIndex >= VIDEO_SOURCES.length) return; // hepsi denendi, elimizden gelen bu
-    // Eski source'u temizle
-    while (bgVideo.firstChild) bgVideo.removeChild(bgVideo.firstChild);
-    // type="video/mp4" ipucunu bilerek koyuyoruz: GitHub raw sunucusu dosyayı
-    // yanlış Content-Type (application/octet-stream) ile gönderiyor, bu ipucu
-    // olmadan bazı tarayıcılar (özellikle Safari/iOS) videoyu hiç tanımıyor.
-    const source = document.createElement('source');
-    source.src = VIDEO_SOURCES[videoSourceIndex];
-    source.type = 'video/mp4';
-    bgVideo.appendChild(source);
-    bgVideo.load();
-    bgVideo.play().catch(() => {}); // autoplay bazen play() çağrısı ister
-  }
-
-  // Video yüklenirken/oynatılırken hata verirse (engel, 404, ağ hatası vb.)
-  // otomatik olarak listedeki bir sonraki kaynağa geç.
-  bgVideo.addEventListener('error', () => {
-    videoSourceIndex++;
-    loadNextVideoSource();
-  });
-
-  loadNextVideoSource();
+  bgVideo.play().catch(() => {});
 
   // ↓↓↓ TANIŞTIĞINIZ GERÇEK TARİH VE SAATİ BURAYA YAZ ↓↓↓
   const START_DATE = new Date(2026, 6, 28, 12, 40, 0);
