@@ -269,9 +269,7 @@
     playsinline
     disablepictureinpicture
     disableremoteplayback
-  >
-    <source src="video.mp4" type="video/mp4">
-  </video>
+  ></video>
   <div class="video-overlay"></div>
 
   <div class="stage-inner">
@@ -324,6 +322,35 @@
 </div>
 
 <script>
+  // ---- Video kaynağı: GitHub raw + CDN mirror'ları (bölgesel engel/kesinti yedeği) ----
+  // raw.githubusercontent.com bazı ülkelerde ISP seviyesinde yavaşlatılabiliyor/erişilemeyebiliyor.
+  // Bu yüzden önce jsDelivr ve statically.io gibi GitHub içeriğini aynen aynalayan (mirror)
+  // CDN'leri deniyoruz, onlar da çalışmazsa en son doğrudan raw linke düşüyoruz.
+  const bgVideo = document.getElementById('bgVideo');
+  const VIDEO_SOURCES = [
+    'https://cdn.jsdelivr.net/gh/yuno-server/yagmur-timer@main/video.mp4',
+    'https://cdn.statically.io/gh/yuno-server/yagmur-timer/main/video.mp4',
+    'https://raw.githubusercontent.com/yuno-server/yagmur-timer/main/video.mp4'
+  ];
+  let videoSourceIndex = 0;
+
+  function loadNextVideoSource(){
+    if (videoSourceIndex >= VIDEO_SOURCES.length) return; // hepsi denendi, elimizden gelen bu
+    const url = VIDEO_SOURCES[videoSourceIndex];
+    bgVideo.src = url;
+    bgVideo.load();
+    bgVideo.play().catch(() => {}); // autoplay bazen play() çağrısı ister
+  }
+
+  // Video yüklenirken/oynatılırken hata verirse (engel, 404, ağ hatası vb.)
+  // otomatik olarak listedeki bir sonraki kaynağa geç.
+  bgVideo.addEventListener('error', () => {
+    videoSourceIndex++;
+    loadNextVideoSource();
+  });
+
+  loadNextVideoSource();
+
   // ↓↓↓ TANIŞTIĞINIZ GERÇEK TARİH VE SAATİ BURAYA YAZ ↓↓↓
   const START_DATE = new Date(2026, 6, 28, 12, 40, 0);
   // ↑↑↑ Sadece bu satırı değiştir, gerisi otomatik ↑↑↑
@@ -390,7 +417,6 @@
   const rotateOverlay = document.getElementById('rotateOverlay');
   const rotateBtn = document.getElementById('rotateBtn');
   const soundTutorial = document.getElementById('soundTutorial');
-  const bgVideo = document.getElementById('bgVideo');
 
   let forced = false;
   let soundEnabled = false;
