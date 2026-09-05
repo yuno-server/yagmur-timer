@@ -323,15 +323,12 @@
 </div>
 
 <script>
-  // ---- Video kaynağı: GitHub raw + CDN mirror'ları (bölgesel engel/kesinti yedeği) ----
-  // raw.githubusercontent.com bazı ülkelerde ISP seviyesinde yavaşlatılabiliyor/erişilemeyebiliyor.
-  // Bu yüzden önce jsDelivr ve statically.io gibi GitHub içeriğini aynen aynalayan (mirror)
-  // CDN'leri deniyoruz, onlar da çalışmazsa en son doğrudan raw linke düşüyoruz.
+  // ---- Video kaynağı: önce Google Drive, olmazsa GitHub yedekleri ----
   const bgVideo = document.getElementById('bgVideo');
   const VIDEO_SOURCES = [
+    'https://drive.google.com/uc?export=download&id=1KOgElVqrLwHyU-00Yz1As0tyNemXqFpZ',
     'https://cdn.jsdelivr.net/gh/yuno-server/yagmur-timer@main/video.mp4',
-    'https://cdn.statically.io/gh/yuno-server/yagmur-timer/main/video.mp4',
-    'https://raw.githubusercontent.com/yuno-server/yagmur-timer/main/video.mp4'
+    'https://yuno-server.github.io/yagmur-timer/video.mp4'
   ];
   let videoSourceIndex = 0;
 
