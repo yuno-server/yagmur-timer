@@ -269,6 +269,7 @@
     playsinline
     disablepictureinpicture
     disableremoteplayback
+    crossorigin="anonymous"
   ></video>
   <div class="video-overlay"></div>
 
@@ -336,8 +337,15 @@
 
   function loadNextVideoSource(){
     if (videoSourceIndex >= VIDEO_SOURCES.length) return; // hepsi denendi, elimizden gelen bu
-    const url = VIDEO_SOURCES[videoSourceIndex];
-    bgVideo.src = url;
+    // Eski source'u temizle
+    while (bgVideo.firstChild) bgVideo.removeChild(bgVideo.firstChild);
+    // type="video/mp4" ipucunu bilerek koyuyoruz: GitHub raw sunucusu dosyayı
+    // yanlış Content-Type (application/octet-stream) ile gönderiyor, bu ipucu
+    // olmadan bazı tarayıcılar (özellikle Safari/iOS) videoyu hiç tanımıyor.
+    const source = document.createElement('source');
+    source.src = VIDEO_SOURCES[videoSourceIndex];
+    source.type = 'video/mp4';
+    bgVideo.appendChild(source);
     bgVideo.load();
     bgVideo.play().catch(() => {}); // autoplay bazen play() çağrısı ister
   }
