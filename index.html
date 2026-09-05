@@ -270,7 +270,7 @@
     disablepictureinpicture
     disableremoteplayback
   >
-    <source src="video.mp4" type="video/mp4">
+    <source src="https://www.image2url.com/r2/default/videos/1788606104170-c81166f4-7a92-4096-b5c6-f3db693b3549.mp4" type="video/mp4">
   </video>
   <div class="video-overlay"></div>
 
@@ -326,6 +326,32 @@
 <script>
   const bgVideo = document.getElementById('bgVideo');
   bgVideo.play().catch(() => {});
+
+  // ---- Video "canlı" senkronizasyon: hiç durmayan bir yayın gibi ----
+  // Videonun süresine göre şu anki gerçek zamandan (Unix zaman damgası) hesap
+  // yapıp videoyu doğru saniyeye atlatıyoruz. Böylece sayfayı kim, ne zaman
+  // açarsa açsın video hep aynı "canlı" andan oynuyormuş gibi görünüyor —
+  // sayfa her açıldığında baştan başlamıyor.
+  function syncBgVideoToLiveTime(force){
+    const duration = bgVideo.duration;
+    if (!duration || isNaN(duration) || duration <= 0) return;
+    const nowSec = Date.now() / 1000;
+    let target = nowSec % duration;
+    if (target < 0) target += duration;
+    const diff = Math.abs(bgVideo.currentTime - target);
+    // Küçük farkları görmezden gel (akışı kesmesin), sadece belirgin
+    // sapmalarda ya da zorlandığında (force) senkronize et.
+    if (force || diff > 0.5) {
+      bgVideo.currentTime = target;
+    }
+  }
+
+  bgVideo.addEventListener('loadedmetadata', () => syncBgVideoToLiveTime(true));
+  // Video döngüye her girdiğinde (loop) de tazeleyelim, süre yuvarlama
+  // hatalarından kaynaklanan küçük kaymalar birikmesin.
+  bgVideo.addEventListener('seeked', () => {});
+  bgVideo.addEventListener('ended', () => syncBgVideoToLiveTime(true));
+  setInterval(() => syncBgVideoToLiveTime(false), 5000);
 
   // ↓↓↓ TANIŞTIĞINIZ GERÇEK TARİH VE SAATİ BURAYA YAZ ↓↓↓
   const START_DATE = new Date(2026, 6, 28, 12, 40, 0);
@@ -483,6 +509,7 @@
     if (document.hidden) {
       bgVideo.pause();
     } else {
+      syncBgVideoToLiveTime(true);
       bgVideo.play().catch(() => {});
     }
   });
